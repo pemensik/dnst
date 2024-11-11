@@ -1,15 +1,20 @@
 use std::path::Path;
+use std::process::ExitCode;
 
 use clap::Parser;
 use dnst::commands::{nsec3hash::Nsec3Hash, LdnsCommand};
 
-fn main() {
+fn main() -> ExitCode {
     // If none of the ldns-* tools matched, then we continue with clap
     // argument parsing.
     let args = try_ldns_compatibility().unwrap_or_else(dnst::Args::parse);
 
-    if let Err(err) = args.execute() {
-        eprintln!("{}", err);
+    match args.execute() {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(err) => {
+            err.pretty_print();
+            ExitCode::FAILURE
+        }
     }
 }
 
@@ -25,8 +30,8 @@ fn try_ldns_compatibility() -> Option<dnst::Args> {
 
     match res {
         Ok(args) => Some(args),
-        Err(e) => {
-            eprintln!("{e}");
+        Err(err) => {
+            err.pretty_print();
             std::process::exit(1)
         }
     }
