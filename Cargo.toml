@@ -2,6 +2,7 @@
 name = "dnst"
 version = "0.1.0"
 edition = "2021"
+default-run = "dnst"
 
 [[bin]]
 name = "ldns"
